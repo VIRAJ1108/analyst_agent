@@ -1,2 +1,4 @@
 pydantic
 pandas
+langgraph
+langchain-groq
