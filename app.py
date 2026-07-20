@@ -6,41 +6,54 @@ def main():
 
     # Initial Graph State
     state = GraphState(
-        user_query="""Analyze the sales performance of the business and identify the key factors affecting revenue and profitability. Suggest the most important analyses
-                        needed to generate meaningful business insights.""",
+        user_query="Analyze this dataset and generate meaningful business insights.",
         csv_path="data/sample_superstore.csv"
     )
 
-    # Run Workflow
+    final_state = None
+
+    print("=" * 80)
+    print("RUNNING WORKFLOW")
+    print("=" * 80)
+
+    # Stream execution
     for event in workflow.stream(state):
-        print(event)
-    # result = workflow.invoke(state)
+        pprint(event)
+        print("-" * 80)
 
+        # Keep updating final_state
+        final_state = list(event.values())[0]
 
-    # print("=" * 80)
-    # print("DATASET SUMMARY")
-    # print("=" * 80)
-    # pprint(result["dataset_summary"].model_dump())
+    print("\n")
+    print("=" * 80)
+    print("FINAL OUTPUTS")
+    print("=" * 80)
 
-    # print("=" * 80)
-    # print("ANALYSIS PLAN")
-    # print("=" * 80)
+    print("\n📌 Dataset Summary")
+    pprint(final_state.dataset_summary)
 
-    # for task in result["analysis_plan"].tasks:
-    #     print(task.analysis_name)
+    print("\n📌 Analysis Plan")
+    pprint(final_state.analysis_plan)
 
-    # print("=" * 80)
-    # print("PLAN REVIEW")
-    # print("=" * 80)
+    print("\n📌 Plan Review")
+    pprint(final_state.plan_review)
 
-    # pprint(result["plan_review"].model_dump())
+    print("\n📌 Analysis Results")
+    pprint(final_state.analysis_results)
 
-    # print("=" * 80)
-    # print("REVIEW ATTEMPTS")
-    # print("=" * 80)
+    print("\n📌 Business Insights")
+    pprint(final_state.business_insights)
 
-    # print(result["review_attempts"])
+    print("\n📌 Visualization Plans")
+    pprint(final_state.visualization_plans)
 
+    print("\n📌 Generated Charts")
+    pprint(final_state.chart_paths)
 
+    print("\n📌 Final Report")
+    pprint(final_state.final_report)
+
+     
+   
 if __name__ == "__main__":
     main()
