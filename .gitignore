@@ -28,4 +28,7 @@ data/output/
 .DS_Store
 Thumbs.db
 
+#Folders to exclude
+tests/
+data/
 

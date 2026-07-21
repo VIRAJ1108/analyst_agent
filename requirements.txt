@@ -1,4 +1,10 @@
 pydantic
 pandas
+matplotlib 
+
 langgraph
+langchain
+langchain-google-genai
 langchain-groq
+
+python-dotenv

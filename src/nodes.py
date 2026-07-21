@@ -200,13 +200,21 @@ def trend_analysis(df, task):
 
 def correlation_analysis(df, task):
     columns = task.required_columns
+    numeric_columns = df[columns].select_dtypes(include="number").columns.tolist()
 
-    correlation_result = (df[columns].corr().to_dict())
+    if len(numeric_columns) < 2:
+        return AnalysisResult(
+            analysis_name=task.analysis_name,
+            result={},
+            summary="Correlation analysis requires at least two numeric columns."
+        )
+    
+    correlation_result = (df[numeric_columns].corr().to_dict())
 
     return AnalysisResult(
         analysis_name=task.analysis_name,
         result=correlation_result,
-        summary=f"Computed correlation among {', '.join(columns)}."
+        summary=f"Computed correlation among {', '.join(numeric_columns)}."
     )
 
 def distribution_analysis(df, task):
@@ -282,11 +290,18 @@ def business_insight_generator(state: GraphState) -> GraphState:
     print("===== Business Insight Generator Started =====")
 
     try:
+        analysis_text = ""
+        for analysis in state.analysis_results.analyses:
+            analysis_text += f"""
+            Analysis: {analysis.analysis_name}
+            Summary:{analysis.summary}"""
+
 
         prompt = BUSINESS_INSIGHT_PROMPT.format(
             dataset_summary=str(state.dataset_summary),
             user_query=state.user_query,
-            analysis_results=str(state.analysis_results)
+            # analysis_results=str(state.analysis_results)
+            analysis_results = analysis_text
         )
 
         structured_llm = llm.with_structured_output(BusinessInsights)
@@ -318,7 +333,8 @@ def visualization_planner(state: GraphState) -> GraphState:
         prompt = VISUALIZATION_PLANNER_PROMPT.format(
             user_query=state.user_query,
             analysis_results=str(state.analysis_results),
-            business_insights=str(state.business_insights)
+            business_insights=str(state.business_insights),
+            columns=", ".join(state.dataframe.columns)
         )
 
         structured_llm = llm.with_structured_output(VisualizationPlans)
@@ -397,11 +413,16 @@ def report_generator(state: GraphState) -> GraphState:
     print("===== Report Generator Started =====")
 
     try:
+        analysis_summary = ""
+        for analysis in state.analysis_results.analyses:
+            analysis_summary += f"""
+            Analysis: {analysis.analysis_name}
+            Summary:{analysis.summary}"""
 
         prompt = REPORT_GENERATOR_PROMPT.format(
             user_query=state.user_query,
             dataset_summary=str(state.dataset_summary),
-            analysis_results=str(state.analysis_results),
+            analysis_results=analysis_summary,
             business_insights=str(state.business_insights)
         )
 

@@ -55,11 +55,28 @@ Each task must contain:
 - required_columns
 - pattern
 
+Pattern Selection Rules:
+
+- correlation_analysis:
+  Use ONLY when ALL required columns are numeric.
+
+- group_analysis:
+  Use when one column is categorical and another is numeric.
+
+- trend_analysis:
+  Use for date/time columns.
+
+- ranking_analysis:
+  Use for ranking categories.
+
+- distribution_analysis:
+  Use for a single numeric column.
+
 Return only a valid AnalysisPlan object.
 """
 
 PLAN_REVIEW_PROMPT = """
-YYou are a Senior Business Analytics Reviewer.
+You are a Senior Business Analytics Reviewer.
 
 Your responsibility is to review the proposed analysis plan.
 
@@ -166,6 +183,21 @@ Guidelines:
     - source_analysis
 
 Do NOT generate any plotting code.
+
+Important Instructions:
+
+1. Use ONLY the exact column names provided below.
+2. Do NOT invent new columns such as "Month", "Year", "Quarter", etc.
+3. If a chart requires a derived value (e.g., monthly trend), use the original column (e.g., "Order Date"). The Python chart generator will handle any required transformations.
+4. Ensure x_column and y_column exactly match the dataset column names.
+5. If an aggregation is required, use the original numeric column.
+   Example:
+   - Category vs Sales ✅
+   - Region vs Profit ✅
+   - Category vs Count ❌
+6. The Python chart generator will perform aggregation automatically.
+Available Dataset Columns:
+{columns}
 
 User Query:
 {user_query}
